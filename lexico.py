@@ -21,3 +21,20 @@ class analisadorLexico():
             print('Erro ao abrir o arquivo')
 
         self.sintatico = 0
+
+    def voltarCabeca(self):
+        self.cabeca -= 1
+
+    def getCaractere(self):
+	    return '\0' if self.cabeca >= len(self.arquivo) else self.arquivo[self.cabeca]
+
+    def proximoCaractere(self):
+	    if self.cabeca >= len(self.arquivo):
+		    return '\0'
+	    else:
+		    self.cabeca += 1
+		    return self.arquivo[self.cabeca - 1]
+    
+    def avancaEspacos(self):
+	    while self.getCaractere() in ' \t\r\n':
+		    self.proximoCaractere()
