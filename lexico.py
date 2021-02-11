@@ -39,6 +39,22 @@ class analisadorLexico():
 	    while self.getCaractere() in ' \t\r\n':
 		    self.proximoCaractere()
 
+    def proximoToken(self): 
+        Token, Value = self.lerToken()
+        while Token == 'Comentario':
+           Token, Value = self.lerToken()
+            
+        self.indiceAnterior += 1
+        dados = [Token, Value,None, None]
+        self.tabelaToknes.append(dados)
+        return Token, Value
+
+    def lerToken(self):
+        self.avancaEspacos()
+        caractere = self.proximoCaractere()
+        if caractere == '\0':
+            return None, None
+
     def criaTabela(self):
         while (self.cabeca < len(self.arquivo)):
             self.proximoToken()
