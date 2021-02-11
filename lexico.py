@@ -38,3 +38,7 @@ class analisadorLexico():
     def avancaEspacos(self):
 	    while self.getCaractere() in ' \t\r\n':
 		    self.proximoCaractere()
+
+    def criaTabela(self):
+        while (self.cabeca < len(self.arquivo)):
+            self.proximoToken()
