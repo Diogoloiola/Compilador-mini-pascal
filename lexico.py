@@ -56,6 +56,28 @@ class analisadorLexico():
             return None, None
         elif caractere.lower() in source.palavrasLinguagem.IDENTIFICADOR_CONSTANTE:
             return self.processaIdentificador(caractere)
+        elif caractere.lower() in source.palavrasLinguagem.CONSTANTE_NUMEROS or caractere == '$':
+            return self.processaNumeros(caractere)
+
+    def processaNumeros(self, char):
+        proximo = self.proximoCaractere()
+        if proximo.lower() in source.palavrasLinguagem.IDENTIFICADOR_CONSTANTE:
+            raise analisadorLexicoErro('identificador nao pode comecar com numero')
+        self.voltarCabeca()
+        numero = ''
+        if char == '$':
+            char = self.proximoCaractere().lower()
+            if char not in source.palavrasLinguagem.CONSTANTE_NUMEROS_HEXADECIMAL:
+                self.voltarCabeca()
+                raise analisadorLexicoErro('Erro caractere $ nao e permitido')
+            
+            while char in source.palavrasLinguagem.CONSTANTE_NUMEROS_HEXADECIMAL:
+                numero += char
+                char = self.proximoCaractere().lower()
+            
+            self.voltarCabeca()
+            return 'Inteiro', int(numero, 16)
+        # Thiago finaliza a função como foi combinado na reunião
 
     def processaIdentificador(self, caractere):
         identificador = ''
@@ -80,3 +102,4 @@ class analisadorLexico():
     def criaTabela(self):
         while (self.cabeca < len(self.arquivo)):
             self.proximoToken()
+    
