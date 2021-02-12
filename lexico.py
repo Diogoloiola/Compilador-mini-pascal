@@ -54,6 +54,28 @@ class analisadorLexico():
         caractere = self.proximoCaractere()
         if caractere == '\0':
             return None, None
+        elif caractere.lower() in source.palavrasLinguagem.IDENTIFICADOR_CONSTANTE:
+            return self.processaIdentificador(caractere)
+
+    def processaIdentificador(self, caractere):
+        identificador = ''
+        while caractere.lower() in source.palavrasLinguagem.IDENTIFICADOR_CONSTANTE or caractere.lower() in source.palavrasLinguagem.CONSTANTE_NUMEROS:
+            identificador += caractere
+            caractere = self.proximoCaractere()
+        
+        self.voltarCabeca()
+        identificador = identificador.lower()
+        if identificador == 'false' or identificador == 'true':
+            return identificador.lower(),'Boolean'
+        elif identificador in self.tipos.keys():
+            return self.tipos[identificador].lower(), self.tipos[identificador].lower()
+        elif identificador in self.operadores.keys():
+            return self.operadores[identificador].lower(), self.operadores[identificador].lower()
+        elif identificador in self.palavrasReservdas.keys():
+            return self.palavrasReservdas[identificador].lower(), self.palavrasReservdas[identificador].lower()
+        else:
+            return identificador,'identificador'
+
 
     def criaTabela(self):
         while (self.cabeca < len(self.arquivo)):
