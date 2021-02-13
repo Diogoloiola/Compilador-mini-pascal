@@ -49,6 +49,14 @@ class analisadorLexico():
         self.tabelaToknes.append(dados)
         return Token, Value
 
+    def getCaractereLiteral(self):
+        caractere = self.proximoCaractere()
+        if caractere != '$' and caractere not in source.palavrasLinguagem.CONSTANTE_NUMEROS:
+            return None
+        else:
+            token, valor = self.processaNumeros(caractere)
+            return chr(valor) if token == 'Inteiro' else None
+
     def lerToken(self):
         self.avancaEspacos()
         caractere = self.proximoCaractere()
@@ -58,6 +66,8 @@ class analisadorLexico():
             return self.processaIdentificador(caractere)
         elif caractere.lower() in source.palavrasLinguagem.CONSTANTE_NUMEROS or caractere == '$':
             return self.processaNumeros(caractere)
+        elif caractere == '#' or caractere == "'":
+            return self.ProcessaString(caractere)
 
     def processaNumeros(self, char):
         proximo = self.proximoCaractere()
@@ -97,6 +107,33 @@ class analisadorLexico():
             else:
                 return int(numero, 10), 'numero'
         #Finalizado Gustavo
+
+    def ProcessaString(self, caractere):
+        valor = ''
+        while caractere == '#' or caractere == "'":
+            if caractere == '#':
+                caractere = self.getCaractereLiteral()
+                if caractere == None:
+                    raise analisadorLexicoErro('Aconteceu um erro lexico aqui')
+                valor += caractere
+                caractere = self.proximoCaractere()
+            else:
+                caractere = self.proximoCaractere()
+                if caractere == '\0':
+                    raise analisadorLexicoErro('Aconteceu um erro lexico aqui')
+                while caractere != "'":
+                    valor += caractere
+                    caractere = self.proximoCaractere()
+                    if caractere == '\0':
+                        raise analisadorLexicoErro('Aconteceu um erro lexico aqui')
+                caractere = self.proximoCaractere()
+                if caractere == "'":
+                    valor += "'"
+        self.voltarCabeca()
+        if len(valor) == 1:
+            return valor,'caractere'
+        else:
+            return valor, 'string'
 
     def processaIdentificador(self, caractere):
         identificador = ''
