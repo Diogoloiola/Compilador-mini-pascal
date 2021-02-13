@@ -77,7 +77,26 @@ class analisadorLexico():
             
             self.voltarCabeca()
             return 'Inteiro', int(numero, 16)
-        # Thiago finaliza a função como foi combinado na reunião
+        else:
+            Float = False
+            while char in source.palavrasLinguagem.CONSTANTE_NUMEROS or (not Float and char == '.'):
+                if char == '.':
+                    Float = True
+                    if self.getCaractere() == '.':
+                        Float = False
+                        break
+                numero += char
+                char = self.proximoCaractere()
+            
+            self.voltarCabeca()
+            if numero.endswith('.'):
+                raise analisadorLexicoErro('Aconteceu um erro lexico aqui, aparatemente tem um . a mais')
+            
+            if Float:
+                return float(numero), 'numero'
+            else:
+                return int(numero, 10), 'numero'
+        #Finalizado Gustavo
 
     def processaIdentificador(self, caractere):
         identificador = ''
