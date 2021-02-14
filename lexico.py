@@ -68,6 +68,8 @@ class analisadorLexico():
             return self.processaNumeros(caractere)
         elif caractere == '#' or caractere == "'":
             return self.ProcessaString(caractere)
+        else:
+            return self.processaOperador(caractere)
 
     def processaNumeros(self, char):
         proximo = self.proximoCaractere()
@@ -153,8 +155,55 @@ class analisadorLexico():
             return self.palavrasReservdas[identificador].lower(), self.palavrasReservdas[identificador].lower()
         else:
             return identificador,'identificador'
-
-
+    
+    def processaOperador(self, caractere):
+        if caractere in '+-*=;,)[]':
+            return caractere, caractere
+        elif caractere == '{': 
+            return self.processaComentario(caractere)
+        elif caractere == '.': 
+            if self.getCaractere() != '.':
+                return '.', '.'
+            else:
+                self.proximoCaractere()
+                return '..', '..'
+        elif caractere == ':':
+            if self.getCaractere() != '=':
+                return ':', ':'
+            else:
+                self.proximoCaractere()
+                return ':=', ':='
+        elif caractere == '>':
+            if self.getCaractere() != '=':
+                return '>','>'
+            else:
+                self.proximoCaractere()
+                return '>=', '>='
+        elif caractere == '/':
+            if self.getCaractere() != '/':
+                return '/', '/'
+            else:
+                return self.processaComentario(caractere)
+        elif caractere == '(':
+            if self.getCaractere() != '*':
+                return '(', '('
+            else:
+                return self.processaComentario(caractere)
+        elif caractere == '<':
+            if self.getCaractere() == '=':
+                self.proximoCaractere()
+                return '<=','<='
+            elif self.getCaractere() == '>':
+                self.proximoCaractere()
+                return '<>', '<>'
+            else:
+                return '<', '<'
+        else:
+            raise analisadorLexicoErro('erro lexico')
+    
+    #Diogo continua
+    def processaComentario(self, caractere):
+        pass
     def criaTabela(self):
         while (self.cabeca < len(self.arquivo)):
             self.proximoToken()
