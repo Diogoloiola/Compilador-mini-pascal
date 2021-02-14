@@ -203,7 +203,27 @@ class analisadorLexico():
     
     #Diogo continua
     def processaComentario(self, caractere):
-        pass
+        if caractere == '/':
+            caractere = self.proximoCaractere()
+            while caractere not in '\0\r\n':
+                caractere = self.proximoCaractere()
+        if caractere == '{':
+            caractere = self.proximoCaractere()
+            while caractere != '}':
+                if caractere == '\0':
+                    raise analisadorLexicoErro('erro no comentario.')
+                caractere = self.proximoCaractere()
+        if caractere == '(':
+            self.proximoCaractere()
+            caractere = self.proximoCaractere()
+            prox = self.proximoCaractere()
+            while caractere != '*' or prox != ')':
+                if caractere == '\0' or prox == '\0':
+                    raise analisadorLexicoErro('erro no comentario.')
+                caractere = prox
+                prox = self.proximoCaractere()
+        return 'Comentario', None
+        
     def criaTabela(self):
         while (self.cabeca < len(self.arquivo)):
             self.proximoToken()
