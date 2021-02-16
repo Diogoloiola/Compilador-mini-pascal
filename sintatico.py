@@ -40,3 +40,41 @@ class AnalisadorSintatico(object):
         Chegou ao final da tabela  
         '''
         return self.indice == len(self.tabela)
+    
+    def program(self):
+        '''
+        Função ira validar o inicio do programa
+        '''
+        if self.getToken() != 'program':
+            return False, 'Era esperado um program'
+
+        self.proximoElemento()
+
+        if self.getToken() != "identificador":
+           return False, 'Era esperado um identificador'
+
+        self.proximoElemento()
+
+        if self.getToken() != ';':
+           return False, 'Era esperado um ;'
+        
+        self.proximoElemento()
+        flag = self.bloco()
+        return flag
+    
+    def bloco(self):
+        '''
+        Falta implementar a função bloco
+        '''
+        return True
+    
+    def valida(self):
+        '''
+        Ira Chama a função que inicia a validação
+        '''
+        flag = self.program()
+        if flag:
+            return flag
+        else:
+            return flag
+    
