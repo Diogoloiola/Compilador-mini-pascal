@@ -63,11 +63,26 @@ class AnalisadorSintatico(object):
         return flag
     
     def bloco(self):
-        '''
-        Falta implementar a função bloco
-        '''
-        return True
-    
+        if self.getToken() == 'var':
+            self.declaracoesVariaveis1()
+            if self.getToken() != ';':
+                raise error('era esperado um ;')
+            self.proximoElemento()
+            if self.getToken() == 'const':
+                self.processaConstantes()
+        elif self.getToken() == 'const':
+            self.processaConstantes()
+            self.declaracoesVariaveis1()
+            if self.getToken() != ';':
+                raise error('era esperado um ;')
+            self.proximoElemento()
+            
+    def declaracoesVariaveis1(self):
+        pass
+
+    def processaConstantes(self):
+        pass
+
     def valida(self):
         '''
         Ira Chama a função que inicia a validação
