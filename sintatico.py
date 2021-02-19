@@ -76,9 +76,42 @@ class AnalisadorSintatico(object):
             if self.getToken() != ';':
                 raise error('era esperado um ;')
             self.proximoElemento()
-            
+
+
+
     def declaracoesVariaveis1(self):
-        pass
+        if self.getToken() == 'var':
+            self.proximoElemento()
+            if self.declaracoesVariaveis2(): # fazer função reclarações variaveis 2 como discutimos na reunião.
+                self.proximoElemento()
+                if self.getToken() == ';':
+                    aux = self.indice
+                    self.proximoElemento()
+                    if not self.declaracoesVariaveis2():
+                        self.indice = aux
+                        return True
+                    else:
+                        self.proximoElemento()
+                        while True:
+                            if self.getToken() == ';':
+                                aux = self.indice
+                                self.proximoElemento()
+
+                                if not self.declaracoesVariaveis2():
+                                    self.indice = aux
+                                    return True
+                                else:
+                                    self.proximoElemento()
+                            else:
+                                raise error('precisa de ;')
+                else:
+                    raise error('era esperado um ;')
+        else:
+            return True
+            
+
+
+        
 
     def processaConstantes(self):
         pass
