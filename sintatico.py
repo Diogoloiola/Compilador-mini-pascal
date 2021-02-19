@@ -34,7 +34,7 @@ class AnalisadorSintatico(object):
         '''
         if not self.fimArquivo():
             return self.tabela[self.indice][1]
-     
+
     def fimArquivo(self):
         '''
         Chegou ao final da tabela  
@@ -44,6 +44,12 @@ class AnalisadorSintatico(object):
     def eVariavel(self):
         self.tabela[self.indice][3] = 'var'
     
+    def declaracao(self):
+        """
+            Criada a funcao que seta como true se a variavel está declarada
+        """
+        self.tabela[self.indice][2] = True
+
     def program(self):
         '''
         Função ira validar o inicio do programa
@@ -112,7 +118,7 @@ class AnalisadorSintatico(object):
     
     def declaracoesVariaveis2(self):
         if self.getToken() == 'identificador':
-            self.declaracao() # fazer função declaracao
+            self.declaracao() #funcao feita
             self.eVariavel()
 
             self.proximoElemento()
@@ -124,7 +130,7 @@ class AnalisadorSintatico(object):
                     if self.getToken() == ',':
                         self.proximoElemento()
                         if self.getToken() == 'identificador':
-                            self.declaracao() # fazer função declaracao
+                            self.declaracao() #funcao feita
                             self.eVariavel()
 
                             self.proximoElemento()
