@@ -147,6 +147,12 @@ class AnalisadorSintatico(object):
 
     def processaConstantes(self):
         pass
+    
+    def tipo(self):
+        if self.tipoArray():
+            return True
+        return False
+
 
     def valida(self):
         '''
