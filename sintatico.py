@@ -41,6 +41,9 @@ class AnalisadorSintatico(object):
         '''
         return self.indice == len(self.tabela)
     
+    def eVariavel(self):
+        self.tabela[self.indice][3] = 'var'
+    
     def program(self):
         '''
         Função ira validar o inicio do programa
@@ -77,8 +80,6 @@ class AnalisadorSintatico(object):
                 raise error('era esperado um ;')
             self.proximoElemento()
 
-
-
     def declaracoesVariaveis1(self):
         if self.getToken() == 'var':
             self.proximoElemento()
@@ -108,10 +109,35 @@ class AnalisadorSintatico(object):
                     raise error('era esperado um ;')
         else:
             return True
-            
+    
+    def declaracoesVariaveis2(self):
+        if self.getToken() == 'identificador':
+            self.declaracao() # fazer função declaracao
+            self.eVariavel()
 
+            self.proximoElemento()
 
-        
+            if self.getToken() == ':':
+                self.proximoElemento()
+            else:
+                while True:
+                    if self.getToken() == ',':
+                        self.proximoElemento()
+                        if self.getToken() == 'identificador':
+                            self.declaracao() # fazer função declaracao
+                            self.eVariavel()
+
+                            self.proximoElemento()
+
+                            if self.getToken() == ':':
+                                self.proximoElemento()
+                                break
+                    else:
+                        raise error('algo falou aqui, tipo um :')
+                        return False
+            if self.tipo(): # fazer função tipo
+                return True
+            raise error('tipo da variavel não foi especificada')
 
     def processaConstantes(self):
         pass
