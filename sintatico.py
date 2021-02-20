@@ -151,8 +151,53 @@ class AnalisadorSintatico(object):
     def tipo(self):
         if self.tipoArray():
             return True
+        if self.tiposPrimitivos():
+            return True
         return False
 
+    def tipoArray(self):
+        if self.getToken() != 'array': 
+            return False
+
+        self.proximoElemento()
+        if self.getToken() != '[':
+            raise error('esta faltando o [')
+
+        self.proximoElemento()
+
+        if self.tamanhoArray():
+            self.proximoElemento()
+            if self.getToken() != ']':
+                raise error('esta faltando o ]')
+            self.proximoElemento()
+            if self.getToken() != 'of':
+                raise error('palavra of faltando')
+            self.proximoElemento()
+            
+            if self.tiposPrimitivos():
+                return True
+            raise error('tipo da variavel não foi especificada')
+        else:
+            raise error('tamanho do array nao foi definido')
+
+    def tamanhoArray(self):
+
+        if self.getToken() != 'numero':
+            raise error('era esperado um numero')
+        self.proximoElemento()
+
+        if self.getToken() != '..':
+            raise error('era esperado ..')
+
+        self.proximoElemento()
+        if self.getToken() != 'numero':
+           raise error('era esperado um numero')
+        return True
+        
+    def tiposPrimitivos(self):
+        if self.getToken() in ["char", "integer", "boolean","real"]:
+            return True
+        return False
 
     def valida(self):
         '''
