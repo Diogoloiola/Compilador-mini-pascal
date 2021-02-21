@@ -145,8 +145,14 @@ class AnalisadorSintatico(object):
                 return True
             raise error('tipo da variavel não foi especificada')
 
-    def processaConstantes(self):
-        pass
+        def processaConstantes(self):
+        self.proximoElemento()
+        if self.getToken() != 'identificador':
+            raise error('era esperado um identificador')
+        self.proximoElemento()
+        if self.getToken() != '=':
+            raise error('era esperado um =')
+        self.proximoElemento()
     
     def tipo(self):
         if self.tipoArray():
