@@ -146,13 +146,13 @@ class AnalisadorSintatico(object):
             raise error('tipo da variavel não foi especificada')
 
         def processaConstantes(self):
-        self.proximoElemento()
-        if self.getToken() != 'identificador':
-            raise error('era esperado um identificador')
-        self.proximoElemento()
-        if self.getToken() != '=':
-            raise error('era esperado um =')
-        self.proximoElemento()
+            self.proximoElemento()
+            if self.getToken() != 'identificador':
+                raise error('era esperado um identificador')
+            self.proximoElemento()
+            if self.getToken() != '=':
+                raise error('era esperado um =')
+            self.proximoElemento()
     
     def tipo(self):
         if self.tipoArray():
@@ -160,6 +160,27 @@ class AnalisadorSintatico(object):
         if self.tiposPrimitivos():
             return True
         return False
+
+    def expressao(self):
+        '''
+        analisa a expressão matematica
+        '''
+        if self.expressaoSimples():
+            self.proximoElemento()
+            if self.operadoresRelacionais():
+                self.proximoElemento()
+                if self.expressaoSimples():
+                    return True
+            else:
+                self.voltar()
+                return True 
+        return False
+    
+    def expressaoSimples():
+        pass
+
+    def operadoresRelacionais():
+        pass
 
     def tipoArray(self):
         if self.getToken() != 'array': 
