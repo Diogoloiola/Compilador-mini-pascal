@@ -206,6 +206,19 @@ class AnalisadorSintatico(object):
             return True
         self.voltar()
     
+    def operadoresRelacionais(self):
+        return self.getToken() in  ["=","<>","<","<=",">=",">","or","and"]
+
+    def operadorDeMultiplicacao(self):
+        if self.getToken() == '*' or self.getToken() == '/':
+            return True
+        return False
+
+    def operadorDeSoma(self):
+        if self.getToken() in ["+","-"]:
+            return True
+        return False
+
     def termo(self):
         if self.fator():
             aux = self.indice
