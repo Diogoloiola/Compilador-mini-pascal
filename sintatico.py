@@ -176,9 +176,70 @@ class AnalisadorSintatico(object):
                 return True 
         return False
     
-    def expressaoSimples():
-        pass
-
+    def expressaoSimples(self):
+        # verificar aqui o 
+        flag = self.sinais()
+        if flag or flag == None:
+            self.proximoElemento()
+            if self.termo():
+                aux = self.indice
+                self.proximoElemento()
+                if not self.operadorDeSoma():
+                    self.indice = aux
+                    return True
+                else:
+                    self.proximoElemento()
+                    while True:
+                        if self.termo():
+                            aux = self.indice
+                            self.proximoElemento()
+                            if not self.operadorDeSoma():
+                                self.indice = aux
+                                return True
+                            else:
+                                self.proximoElemento()
+                        else:
+                            return False
+                return True
+    def sinais(self):
+        if self.getToken() in ["+","-"]:
+            return True
+        self.voltar()
+    
+    def termo(self):
+        if self.fator():
+            aux = self.indice
+            self.proximoElemento()
+            if not self.operadorDeMultiplicacao():
+                self.indice = aux
+                return True
+            else:
+                self.proximoElemento()
+                while True:
+                    if self.fator():
+                        aux = self.indice
+                        self.proximoElemento()
+                        if not self.operadorDeMultiplicacao():
+                            self.indice = aux
+                            return True
+                        else:
+                            self.proximoElemento()
+                    else:
+                        return False
+    def fator(self):
+        if self.variavel() or self.getToken() == 'numero':
+            return True
+        elif self.getToken() == '(':
+            self.proximoElemento()
+            if self.expressao():
+                self.proximoElemento()
+                if self.getToken() != ')':
+                    raise error('era esperado um )')
+                return True
+        elif self.getToken() == 'not':
+            self.proximoElemento()
+            if self.fator():
+                return True
     def operadoresRelacionais():
         pass
 
