@@ -254,7 +254,7 @@ class AnalisadorSintatico(object):
             if self.fator():
                 return True
     def operadoresRelacionais():
-        pass
+        return self.getToken() in  ["=","<>","<","<=",">=",">","or","and"]
 
     def tipoArray(self):
         if self.getToken() != 'array': 
