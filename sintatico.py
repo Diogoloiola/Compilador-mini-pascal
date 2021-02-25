@@ -218,6 +218,24 @@ class AnalisadorSintatico(object):
         if self.getToken() in ["+","-"]:
             return True
         return False
+    
+    def variavel(self):
+        if self.variavelNormal():
+            return True
+    
+    def variavelNormal(self):
+        if self.variavelComIdentificador():
+            return True
+        return False
+    
+    def variavelComIdentificador(self):
+        if self.getToken() == 'numero':
+            return True
+        if self.getToken() == 'string':
+            return True
+        if self.getToken() == 'identificador':
+            self.eVariavel()
+            return True
 
     def termo(self):
         if self.fator():
@@ -253,8 +271,6 @@ class AnalisadorSintatico(object):
             self.proximoElemento()
             if self.fator():
                 return True
-    def operadoresRelacionais():
-        return self.getToken() in  ["=","<>","<","<=",">=",">","or","and"]
 
     def tipoArray(self):
         if self.getToken() != 'array': 
