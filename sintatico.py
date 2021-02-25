@@ -237,6 +237,22 @@ class AnalisadorSintatico(object):
             self.eVariavel()
             return True
 
+    def variavelComIndice(self):
+        if self.variavelArray():
+            self.proximoElemento()
+            if self.getToken() != '[':
+                raise error('era esperado um ]')
+            self.proximoElemento()
+            if self.expressao():
+                self.proximoElemento()
+                if self.getToken() != ']':
+                    raise error('era esperado um ]')
+                self.proximoElemento()
+                return True
+    
+    def variavelArray(self):
+        return self.variavelNormal()
+
     def termo(self):
         if self.fator():
             aux = self.indice
