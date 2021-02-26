@@ -366,6 +366,23 @@ class AnalisadorSintatico(object):
         if self.getToken() in ["char", "integer", "boolean","real"]:
             return True
         return False
+    
+    def parteDaDeclaracao(self):
+        return self.declaracaoComposta()
+    
+    def declaracaoComposta(self):
+        if self.getToken() != 'begin':
+            return False
+
+        self.proximoElemento()
+        if self.getToken() == 'end':
+            self.proximoElemento()
+            if self.getToken() != ';':
+                raise error('era esperado ;')
+            self.proximoElemento()
+            return True
+        if self.Declaracao() != True:
+            raise error('deu errado aqui 1')
 
     def valida(self):
         '''
@@ -376,4 +393,3 @@ class AnalisadorSintatico(object):
             return flag
         else:
             return flag
-    
