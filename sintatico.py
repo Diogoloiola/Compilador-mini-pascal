@@ -85,6 +85,7 @@ class AnalisadorSintatico(object):
             if self.getToken() != ';':
                 raise error('era esperado um ;')
             self.proximoElemento()
+        return True
 
     def declaracoesVariaveis1(self):
         if self.getToken() == 'var':
@@ -145,7 +146,7 @@ class AnalisadorSintatico(object):
                 return True
             raise error('tipo da variavel não foi especificada')
 
-        def processaConstantes(self):
+    def processaConstantes(self):
             self.proximoElemento()
             if self.getToken() != 'identificador':
                 raise error('era esperado um identificador')
