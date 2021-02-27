@@ -366,6 +366,57 @@ class AnalisadorSintatico(object):
         if self.getToken() in ["char", "integer", "boolean","real"]:
             return True
         return False
+    
+    def parteDaDeclaracao(self):
+        return self.declaracaoComposta()
+    
+    def declaracaoComposta(self):
+        if self.getToken() != 'begin':
+            return False
+
+        self.proximoElemento()
+        if self.getToken() == 'end':
+            self.proximoElemento()
+            if self.getToken() != ';':
+                raise error('era esperado ;')
+            self.proximoElemento()
+            return True
+        if self.Declaracao() != True:
+            raise error('deu errado aqui 1')
+    
+    def Declaracao(self):
+        '''
+        declaração simples pode ser uma invocação
+        uma atribuição, leitura e escrita de dados 
+        '''
+        if self.declaracaoSimples():
+            return True
+        if self.declaracaoEstruturada():
+            return True
+        return False
+    
+    def declaracaoSimples(self):
+        if self.invocacao():
+        '''
+        ainda pra fazer
+        '''
+            return True
+        elif self.atribuicao():
+        '''
+        ainda pra fazer
+        '''
+            return True
+        elif self.leituraDeDados():
+        '''
+        ainda pra fazer
+        '''
+            return True
+        elif self.escritaDeDados():
+        '''
+        ainda pra fazer
+        '''
+            return True
+        return False
 
     def valida(self):
         '''
@@ -376,4 +427,3 @@ class AnalisadorSintatico(object):
             return flag
         else:
             return flag
-    
