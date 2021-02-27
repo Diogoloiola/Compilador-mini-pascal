@@ -85,7 +85,19 @@ class AnalisadorSintatico(object):
             if self.getToken() != ';':
                 raise error('era esperado um ;')
             self.proximoElemento()
+        if self.getToken() == 'begin':
+            self.parteDaDeclaracao()
+            self.proximoElemento()
+            if self.getToken() != '.':
+                raise error('era esperado um .')
+            return True
+        self.proximoElemento()
+        if self.parteDaDeclaracao():  #falta fazer que reconhece o escopo principal
+            return True
+        raise error('Deu errado aqui')
+        
         return True
+
 
     def declaracoesVariaveis1(self):
         if self.getToken() == 'var':
