@@ -158,28 +158,28 @@ class AnalisadorSintatico(object):
             raise error('tipo da variavel não foi especificada')
 
     def processaConstantes(self):
-            self.proximoElemento()
-            if self.getToken() != 'identificador':
-                raise error('era esperado um identificador')
-            self.proximoElemento()
-            if self.getToken() != '=':
-                raise error('era esperado um =')
-            self.proximoElemento()
-            if self.getToken() != ';':
-               raise error('era esperado um ;')
-            while True:
-                if self.getToken() == ';':
+        self.proximoElemento()
+        if self.getToken() != 'identificador':
+            raise error('era esperado um identificador')
+        self.proximoElemento()
+        if self.getToken() != '=':
+            raise error('era esperado um =')
+        self.proximoElemento()
+        if self.getToken() != ';':
+            raise error('era esperado um ;')
+        while True:
+            if self.getToken() == ';':
+                self.proximoElemento()
+                if self.getToken() == 'identificador':
                     self.proximoElemento()
-                    if self.getToken() == 'identificador':
-                        self.proximoElemento()
-                        if self.getToken() != '=':
-                            raise error('era esperado um =')
-                        self.proximoElemento()
-                        if self.expressao() == False:
-                            raise error('algo deu errado') 
-                        self.proximoElemento()
-                else:
-                    break
+                    if self.getToken() != '=':
+                        raise error('era esperado um =')
+                    self.proximoElemento()
+                    if self.expressao() == False:
+                        raise error('algo deu errado') 
+                    self.proximoElemento()
+            else:
+                break
         self.voltar()
         if self.getToken() != ';':
             raise error('era esperado um ;')
@@ -396,27 +396,36 @@ class AnalisadorSintatico(object):
         return False
     
     def declaracaoSimples(self):
-        if self.invocacao():
-        '''
-        ainda pra fazer
-        '''
+        if self.invocacao(): #ainda pra fazer
             return True
         elif self.atribuicao():
-        '''
-        ainda pra fazer
-        '''
             return True
         elif self.leituraDeDados():
-        '''
-        ainda pra fazer
-        '''
             return True
         elif self.escritaDeDados():
-        '''
-        ainda pra fazer
-        '''
             return True
         return False
+    
+    def leituraDeDados(self):
+        if self.getToken() == 'read':
+            self.proximoElemento()
+            if self.getToken() != '(':
+                raise error('era esperado um (')
+            self.proximoElemento()
+            if self.variavel():
+                self.proximoElemento()
+                if self.getToken() == ')':
+                    return True
+                else:
+                    while True:
+                        if self.getToken() == ',':
+                            self.proximoElemento()
+                            if self.variavel():
+                                self.proximoElemento()
+                        elif self.getToken() == ')':
+                            return True
+                        else:
+                            raise error('algo de errado aconteuceu')
 
     def valida(self):
         '''
@@ -427,3 +436,4 @@ class AnalisadorSintatico(object):
             return flag
         else:
             return flag
+    
