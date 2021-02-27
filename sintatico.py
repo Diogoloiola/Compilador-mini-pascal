@@ -141,7 +141,6 @@ class AnalisadorSintatico(object):
                                 break
                     else:
                         raise error('algo falou aqui, tipo um :')
-                        return False
             if self.tipo(): # fazer função tipo
                 return True
             raise error('tipo da variavel não foi especificada')
@@ -154,6 +153,26 @@ class AnalisadorSintatico(object):
             if self.getToken() != '=':
                 raise error('era esperado um =')
             self.proximoElemento()
+            if self.getToken() != ';':
+               raise error('era esperado um ;')
+            while True:
+                if self.getToken() == ';':
+                    self.proximoElemento()
+                    if self.getToken() == 'identificador':
+                        self.proximoElemento()
+                        if self.getToken() != '=':
+                            raise error('era esperado um =')
+                        self.proximoElemento()
+                        if self.expressao() == False:
+                            raise error('algo deu errado') 
+                        self.proximoElemento()
+                else:
+                    break
+        self.voltar()
+        if self.getToken() != ';':
+            raise error('era esperado um ;')
+        self.proximoElemento()
+        return True
     
     def tipo(self):
         if self.tipoArray():
@@ -223,6 +242,9 @@ class AnalisadorSintatico(object):
     def variavel(self):
         if self.variavelNormal():
             return True
+        if self.variavelComIndice():
+            return True
+        return False
     
     def variavelNormal(self):
         if self.variavelComIdentificador():
