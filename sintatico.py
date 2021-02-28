@@ -427,6 +427,28 @@ class AnalisadorSintatico(object):
                         else:
                             raise error('algo de errado aconteuceu')
 
+    def escritaDeDados(self):
+        if self.getToken() == 'write':
+            self.proximoElemento()
+            if self.getToken() != '(':
+                raise error('era esperado um (')
+            self.proximoElemento()
+            if self.variavel():
+                self.proximoElemento()
+                if self.getToken() == ')':
+                    return True
+                else:
+                    while True:
+                        if self.getToken() == ',':
+                            self.proximoElemento()
+                            if self.variavel():
+                                self.proximoElemento()
+                        elif self.getToken() == ')':
+                            return True
+                        else:
+                            raise error('algo de errado aconteuceu')
+
+
     def valida(self):
         '''
         Ira Chama a função que inicia a validação
