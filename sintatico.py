@@ -448,6 +448,22 @@ class AnalisadorSintatico(object):
                         else:
                             raise error('algo de errado aconteuceu')
 
+    def atribuicao(self):
+        '''
+        analisa expressão matematica 
+        '''
+        tipo = None
+        if self.getToken() != 'identificador':
+            return False
+        self.proximoElemento()
+        if self.getToken() != ':=':
+            raise error('era esperado um :=')
+        self.proximoElemento()
+        if self.expressao():
+             self.eAtribuicao = False
+             self.eAtribuicaoTipoVariavel = False
+             return True
+        raise error('deu erro na hora da atribuicao')
 
     def valida(self):
         '''
