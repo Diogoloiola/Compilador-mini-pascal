@@ -384,6 +384,14 @@ class AnalisadorSintatico(object):
         if self.Declaracao() != True:
             raise error('deu errado aqui 1')
     
+    def declaracaoEstruturada(self):
+        if self.declaracaoComposta():
+            return True
+        elif self.declaracaoIf(): # falta fazer
+            return True
+        elif self.declaracaoWhile(): # falta fazer
+            return True
+    
     def Declaracao(self):
         '''
         declaração simples pode ser uma invocação
