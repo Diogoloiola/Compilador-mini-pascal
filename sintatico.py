@@ -387,10 +387,52 @@ class AnalisadorSintatico(object):
     def declaracaoEstruturada(self):
         if self.declaracaoComposta():
             return True
-        elif self.declaracaoIf(): # falta fazer
+        elif self.declaracaoIf():
             return True
         elif self.declaracaoWhile(): # falta fazer
             return True
+        
+    def declaracaoIf(self):
+        if self.getToken() == 'if':
+            self.proximoElemento()
+            if self.expressao():
+                self.proximoElemento()
+                if self.getToken() != 'then':
+                    raise error('era esperado um then')
+                self.proximoElemento()
+                if self.Declaracao():
+                    self.proximoElemento()
+                    if self.getToken() != ';':
+                        return False
+                    self.proximoElemento()
+                    while True:
+                        if self.Declaracao():
+                            self.proximoElemento()
+                            if self.getToken() != ';':
+                                return False
+                            self.proximoElemento()
+                        else:
+                            break
+                    if self.getToken() == 'else':
+                        self.proximoElemento()
+                        if self.Declaracao():
+                            # if self.getToken() != ')':
+                            #     return False
+                            self.proximoElemento()
+                            if self.getToken() != ';':
+                                return False
+                            
+                            if self.getToken() == ';':
+                                self.voltar()
+                                return True
+
+                            self.proximoElemento()
+                            return True
+                    else:
+                        self.voltar()
+                        self.voltar()
+                        return True
+        return False
     
     def Declaracao(self):
         '''
