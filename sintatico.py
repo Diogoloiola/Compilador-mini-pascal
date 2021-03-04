@@ -515,6 +515,21 @@ class AnalisadorSintatico(object):
              return True
         raise error('deu erro na hora da atribuicao')
 
+    def declaracaoWhile(self):
+        if self.getToken() == 'while':
+            self.proximoElemento()
+            if self.expressao():
+                self.proximoElemento()
+
+                if self.getToken() != 'do':
+                    raise error('era esperado um do')
+                self.proximoElemento()
+                if self.declaracaoComposta():
+                    return True
+                return False
+        else:
+            return False
+
     def valida(self):
         '''
         Ira Chama a função que inicia a validação
