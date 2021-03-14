@@ -70,7 +70,7 @@ class AnalisadorSintatico(object):
         self.proximoElemento()
         flag = self.bloco()
         return flag
-    
+
     def bloco(self):
         if self.getToken() == 'var':
             self.declaracoesVariaveis1()
@@ -85,6 +85,15 @@ class AnalisadorSintatico(object):
             if self.getToken() != ';':
                 raise error('era esperado um ;')
             self.proximoElemento()
+        
+        while True:
+            if self.getToken() == 'procedure':
+                self.procedimento()
+            elif self.getToken() == 'function':
+                self.funcao()
+            else:
+                break
+        
         if self.getToken() == 'begin':
             self.parteDaDeclaracao()
             self.proximoElemento()
