@@ -122,8 +122,18 @@ class AnalisadorSintatico(object):
         self.nomeFuncaoProcedimento = nomeFuncao
         self.identificaFuncaoProcedimento('function')
         self.appendFuncaoProcedimento()
+        self.proximoElemento()
+        if self.getToken() != '(':
+            raise error('era esperado um (')
+        self.proximoElemento()
+        self.processaVariavelProcedimento(nomeFuncao)
+        if self.getToken() != ')':
+                raise error('era esperado um )')
+        self.proximoElemento()
 
 
+    def processaVariavelProcedimento(self):
+        pass
 
     def declaracoesVariaveis1(self):
         if self.getToken() == 'var':
