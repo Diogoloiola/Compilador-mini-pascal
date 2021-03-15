@@ -5,7 +5,7 @@ class AnalisadorSintatico(object):
         self.indice = 0
         self.tabela = []
         self.tabela = tabelaToknes
-        '''
+        
         self.inicio = 0
         self.fim = 0
         self.cont = 0
@@ -14,7 +14,15 @@ class AnalisadorSintatico(object):
         self.variaveisDaFuncoes = {}
         self.nomeFuncaoProcedimento = '' 
         self.declaracaoFuncoesProcedimento = []
-        '''
+
+    def appendFuncaoProcedimento(self):
+        self.declaracaoFuncoesProcedimento.append(self.tabela[self.indice])    
+
+    def identificaFuncaoProcedimento(self, tipo):
+        self.tabela[self.indice][2] = tipo
+    
+    def getValor(self):
+        return self.tabela[self.indice][0]
 
     def proximoElemento(self):
         '''
@@ -85,15 +93,14 @@ class AnalisadorSintatico(object):
             if self.getToken() != ';':
                 raise error('era esperado um ;')
             self.proximoElemento()
-        
         while True:
             if self.getToken() == 'procedure':
-                self.procedimento()
+                #self.procedimento()
+                pass
             elif self.getToken() == 'function':
                 self.funcao()
             else:
                 break
-        
         if self.getToken() == 'begin':
             self.parteDaDeclaracao()
             self.proximoElemento()
@@ -104,8 +111,18 @@ class AnalisadorSintatico(object):
         if self.parteDaDeclaracao():  #falta fazer que reconhece o escopo principal
             return True
         raise error('Deu errado aqui')
-        
-        return True
+
+    def funcao(self):
+        self.proximoElemento()
+        if self.getToken() != 'identificador':
+            raise error('era esperado um identificador')
+        indiceFuncao = self.indice
+        nomeFuncao = self.getValor()
+        self.variaveisDaFuncoes[nomeFuncao] = []
+        self.nomeFuncaoProcedimento = nomeFuncao
+        self.identificaFuncaoProcedimento('function')
+        self.appendFuncaoProcedimento()
+
 
 
     def declaracoesVariaveis1(self):
