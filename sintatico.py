@@ -130,6 +130,17 @@ class AnalisadorSintatico(object):
         if self.getToken() != ')':
                 raise error('era esperado um )')
         self.proximoElemento()
+        
+        
+        if self.getToken() != ':':
+            raise error('era esperado um :')
+        self.proximoElemento()
+        if self.tipo()[0] != True:
+            raise error('tipo da variavel não foi especificada')
+        self.proximoElemento()
+        if self.getToken() != ';':
+            raise error('era esperado um ;')
+        self.proximoElemento()
 
 
     def processaVariavelProcedimento(self,nomeFuncao):
@@ -253,10 +264,11 @@ class AnalisadorSintatico(object):
     
     def tipo(self):
         if self.tipoArray():
-            return True
-        if self.tiposPrimitivos():
-            return True
-        return False
+            return True, ''
+        flag, tipo = self.tiposPrimitivos()
+        if flag:
+            return True, tipo
+        return False,''
 
     def expressao(self):
         '''
