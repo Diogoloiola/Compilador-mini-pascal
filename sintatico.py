@@ -132,8 +132,37 @@ class AnalisadorSintatico(object):
         self.proximoElemento()
 
 
-    def processaVariavelProcedimento(self):
-        pass
+    def processaVariavelProcedimento(self,nomeFuncao):
+         if self.getToken() == 'identificador':
+            self.inicio = self.indice
+            self.proximoElemento()
+            self.proximoElemento()
+            if self.declaracoesVariaveis2(True, nomeFuncao):
+                self.proximoElemento()
+                if self.getToken() == ';':
+                    aux = self.indice
+                    self.proximoElemento()
+                    self.inicio = self.indice
+                    if not self.declaracoesVariaveis2(True, nomeFuncao):
+                        self.indice = aux
+                        return True
+                    else:
+                        self.proximoElemento()
+                        while True:
+                            if self.getToken() == ';':
+                                aux = self.indice
+                                self.proximoElemento()
+                                self.inicio = self.indice
+                                if not self.declaracoesVariaveis2(True, nomeFuncao):
+                                    self.indice = aux
+                                    return True
+                                else:
+                                    self.proximoElemento()
+                            else:
+                                # self.proximoElemento()
+                                break
+                else:
+                    return True
 
     def declaracoesVariaveis1(self):
         if self.getToken() == 'var':
@@ -165,7 +194,7 @@ class AnalisadorSintatico(object):
         else:
             return True
     
-    def declaracoesVariaveis2(self):
+    def declaracoesVariaveis2(self, funcao = None, nomeFuncao = None):
         if self.getToken() == 'identificador':
             self.declaracao() #funcao feita
             self.eVariavel()
