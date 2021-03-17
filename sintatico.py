@@ -141,7 +141,24 @@ class AnalisadorSintatico(object):
         if self.getToken() != ';':
             raise error('era esperado um ;')
         self.proximoElemento()
+        if self.getToken() == 'var':
+            self.declaracoesVariaveis1(None, nomeFuncao)
+            if self.getToken() != ';':
+                raise error('era esperado um ;')
+            self.proximoElemento()
+            if self.getToken() == 'const':
+                self.processaConstantes()
+        elif self.getToken() == 'const':
+            self.processaConstantes()
+            self.declaracoesVariaveis1()
+            if self.getToken() != ';':
+                raise error('era esperado um ;')
+            self.proximoElemento()
 
+        self.parteDaDeclaracao()
+        self.proximoElemento()
+        self.proximoElemento()
+        self.nomeFuncaoProcedimento = ''
 
     def processaVariavelProcedimento(self,nomeFuncao):
          if self.getToken() == 'identificador':
