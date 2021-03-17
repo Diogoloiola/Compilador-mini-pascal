@@ -229,9 +229,32 @@ class AnalisadorSintatico(object):
                                 break
                     else:
                         raise error('algo falou aqui, tipo um :')
-            if self.tipo(): # fazer função tipo
+                        return False
+            flag, tipo = self.tipo()
+            if flag:
+                self.fim = self.indice - 2
+                self.setTipoVariavel(tipo, funcao,nomeFuncao)
                 return True
             raise error('tipo da variavel não foi especificada')
+
+    def setTipoVariavel(self, tipo, funcao, nomeFuncao):
+       estadoFinal = self.indice
+       self.indice = self.inicio
+       for i in range(self.indice, self.fim + 1):
+            if self.getToken() != ',':
+               self.setVariavel(tipo, nomeFuncao)
+               if nomeFuncao != None:
+                   if nomeFuncao != None and funcao == None:
+                        self.tabela[self.indice][5] = 'campo' + nomeFuncao
+                        self.variaveisDaFuncoes[nomeFuncao].append(self.tabela[self.indice])
+                   else:
+                        self.variaveisDaFuncoes[nomeFuncao].append(self.tabela[self.indice])
+               self.proximoElemento()
+               if funcao:
+                   self.cont += 1
+            else:
+               self.proximoElemento()
+       self.indice = estadoFinal
 
     def processaConstantes(self):
         self.proximoElemento()
