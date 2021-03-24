@@ -95,7 +95,7 @@ class AnalisadorSintatico(object):
             self.proximoElemento()
         while True:
             if self.getToken() == 'procedure':
-                #self.procedimento()
+                self.procedimento()
                 pass
             elif self.getToken() == 'function':
                 self.funcao()
@@ -111,6 +111,37 @@ class AnalisadorSintatico(object):
         if self.parteDaDeclaracao():  #falta fazer que reconhece o escopo principal
             return True
         raise error('Deu errado aqui')
+    
+    def procedimento(self):
+        self.proximoElemento()
+        if self.getToken() != 'identificador':
+            raise error('era esperado um identificador')
+        nomeFuncao = self.getValor()
+        self.variaveisDaFuncoes[nomeFuncao] = []
+        self.nomeFuncaoProcedimento = nomeFuncao
+        self.identificaFuncaoProcedimento('procedure')
+        self.appendFuncaoProcedimento()
+        self.proximoElemento()
+        if self.getToken() != ';':
+            raise error('era esperado um ;')
+        self.proximoElemento()
+
+        if self.getToken() == 'var':
+            self.declaracoesVariaveis1(None, nomeFuncao)
+            if self.getToken() != ';':
+                raise error('era esperado um ;')
+            self.proximoElemento()
+            if self.getToken() == 'const':
+                self.processaConstantes()
+        elif self.getToken() == 'const':
+            self.processaConstantes()
+            self.declaracoesVariaveis1(None, nomeFuncao)
+            if self.getToken() != ';':
+                raise error('era esperado um ;')
+            self.proximoElemento()
+        self.parteDaDeclaracao()
+        self.proximoElemento()
+        self.nomeFuncaoProcedimento = ''
 
     def funcao(self):
         self.proximoElemento()
@@ -272,6 +303,11 @@ class AnalisadorSintatico(object):
             else:
                self.proximoElemento()
        self.indice = estadoFinal
+    
+    def setVariavel(self, tipo, nomeFuncao):
+        self.tabela[self.indice][4] = tipo
+        if nomeFuncao != '':
+            self.tabela[self.indice][5] = nomeFuncao
 
     def processaConstantes(self):
         self.proximoElemento()
