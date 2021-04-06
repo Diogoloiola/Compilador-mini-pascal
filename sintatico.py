@@ -1,4 +1,4 @@
-from os import error, truncate
+from os import error, read, truncate
 
 class AnalisadorSintatico(object):
     def __init__(self, tabelaToknes):
@@ -131,6 +131,7 @@ class AnalisadorSintatico(object):
             self.proximoElemento()
 
         self.parteDaDeclaracao()
+        self.proximoElemento()
         self.proximoElemento()
         self.nomeFuncaoProcedimento = ''
 
@@ -563,12 +564,18 @@ class AnalisadorSintatico(object):
             self.voltar()
             return False
         if not flag:
-            raise error('funcao nao declarada')
+            msg = 'funcao nao declarada' + nomeFuncao
+            raise error(msg)
         self.proximoElemento()
         variaveis = self.getTiposVariaveisFuncoes(nomeFuncao) #ajeitar isso aqui
         indiceVariavel = 0
         while True:
+            if tipo == 'procedure':
+                break
             if self.variavel():
+                if indiceVariavel >= len(variaveis):
+                    msg = 'a quantidade de parametros esta errada, a quantidade fornecida foi ' + str(indiceVariavel + 1) + ' e quantidade esperada e ' + str(len(variaveis))
+                    raise error(msg)
                 if self.getToken() == 'numero':
                     tipoInteiro = type(self.getValor()) == int
                     tipofloat =  type(self.getValor()) == float
@@ -596,6 +603,9 @@ class AnalisadorSintatico(object):
                     self.proximoElemento()
             else:
                 break
+        if indiceVariavel != len(variaveis):
+            msg = 'a quantidade de parametros esta errada, a quantidade fornecida foi ' + str(indiceVariavel) + ' e quantidade esperada e' + str(len(variaveis))
+            raise error(msg)
         if self.getToken() != ')':
             return False
         return True
@@ -648,9 +658,13 @@ class AnalisadorSintatico(object):
         self.eAtribuicao = True
         self.eAtribuicaoTipoVariavel = tipo
         if self.expressao():
-             self.eAtribuicao = False
-             self.eAtribuicaoTipoVariavel = False
-             return True
+            self.proximoElemento()
+            if self.getToken() != ';':
+                raise error('era esperado um ;')
+            self.voltar()
+            self.eAtribuicao = False
+            self.eAtribuicaoTipoVariavel = False
+            return True
         raise error('deu erro na hora da atribuicao')
 
     def variavel(self):
@@ -682,7 +696,11 @@ class AnalisadorSintatico(object):
                 msg = 'tipos incompativeis ' + self.getToken() + ' mas a variavel e do tipo ' + self.eAtribuicaoTipoVariavel
                 raise error(msg)
             else:
-                tipo = self.pesquisaVariavel()
+                tipo = None
+                if  self.nomeFuncaoProcedimento != '':
+                    tipo = self.getTiposVariaveisFuncoes(self.nomeFuncaoProcedimento, True)
+                if tipo == None:
+                    tipo = self.pesquisaVariavel()
                 if tipo == self.eAtribuicaoTipoVariavel:
                     return True
                 raise error('tipos incompativeis')

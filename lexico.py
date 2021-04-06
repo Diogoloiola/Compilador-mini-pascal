@@ -1,3 +1,5 @@
+from os import error
+from typing import ChainMap
 import source.palavrasLinguagem
 
 class analisadorLexicoErro(Exception): pass
@@ -18,8 +20,7 @@ class analisadorLexico():
             arquivoBuffer = open(arquivo,'r')
             self.arquivo = arquivoBuffer.read()
         except:
-            print('Erro ao abrir o arquivo')
-
+            raise error('falha ao abrir o arquivo')
         self.sintatico = 0
 
     def voltarCabeca(self):
@@ -39,16 +40,6 @@ class analisadorLexico():
 	    while self.getCaractere() in ' \t\r\n':
 		    self.proximoCaractere()
 
-    def proximoToken(self): 
-        Token, Value = self.lerToken()
-        while Token == 'Comentario':
-           Token, Value = self.lerToken()
-            
-        self.indiceAnterior += 1
-        dados = [Token, Value,None, None]
-        self.tabelaToknes.append(dados)
-        return Token, Value
-
     def getCaractereLiteral(self):
         caractere = self.proximoCaractere()
         if caractere != '$' and caractere not in source.palavrasLinguagem.CONSTANTE_NUMEROS:
@@ -56,6 +47,20 @@ class analisadorLexico():
         else:
             token, valor = self.processaNumeros(caractere)
             return chr(valor) if token == 'Inteiro' else None
+    
+    def proximoToken(self):
+       if self.indiceAnterior < len(self.tabelaToknes):
+           self.indiceAnterior += 1
+           return self.tabelaToknes[self.indiceAnterior - 1]
+       else:
+           Token, Value = self.lerToken()
+           while Token == 'Comentario':
+               Token, Value = self.lerToken()
+            
+           self.indiceAnterior += 1
+           dados = [Token, Value,None, None, None, None]
+           self.tabelaToknes.append(dados)
+           return Token, Value
 
     def lerToken(self):
         self.avancaEspacos()
@@ -70,7 +75,29 @@ class analisadorLexico():
             return self.ProcessaString(caractere)
         else:
             return self.processaOperador(caractere)
+    
+    def processaIdentificador(self, caractere):
+        identificador = ''
+        if caractere in [',',';','/',':','_','@',')','(']:
+            raise error('indenticador errado')
+        while caractere.lower() in source.palavrasLinguagem.IDENTIFICADOR_CONSTANTE or caractere.lower() in source.palavrasLinguagem.CONSTANTE_NUMEROS:
+            identificador += caractere
+            caractere = self.proximoCaractere()
+        
+        self.voltarCabeca()
+        identificador = identificador.lower()
+        if identificador == 'false' or identificador == 'true':
+            return identificador.lower(),'Boolean'
+        elif identificador in self.tipos.keys():
+            return self.tipos[identificador].lower(), self.tipos[identificador].lower()
+        elif identificador in self.operadores.keys():
+            return self.operadores[identificador].lower(), self.operadores[identificador].lower()
+        elif identificador in self.palavrasReservdas.keys():
+            return self.palavrasReservdas[identificador].lower(), self.palavrasReservdas[identificador].lower()
+        else:
+            return identificador,'identificador'
 
+    
     def processaNumeros(self, char):
         proximo = self.proximoCaractere()
         if proximo.lower() in source.palavrasLinguagem.IDENTIFICADOR_CONSTANTE:
@@ -108,7 +135,6 @@ class analisadorLexico():
                 return float(numero), 'numero'
             else:
                 return int(numero, 10), 'numero'
-        #Finalizado Gustavo
 
     def ProcessaString(self, caractere):
         valor = ''
@@ -136,26 +162,29 @@ class analisadorLexico():
             return valor,'caractere'
         else:
             return valor, 'string'
-
-    def processaIdentificador(self, caractere):
-        identificador = ''
-        while caractere.lower() in source.palavrasLinguagem.IDENTIFICADOR_CONSTANTE or caractere.lower() in source.palavrasLinguagem.CONSTANTE_NUMEROS:
-            identificador += caractere
-            caractere = self.proximoCaractere()
-        
-        self.voltarCabeca()
-        identificador = identificador.lower()
-        if identificador == 'false' or identificador == 'true':
-            return identificador.lower(),'Boolean'
-        elif identificador in self.tipos.keys():
-            return self.tipos[identificador].lower(), self.tipos[identificador].lower()
-        elif identificador in self.operadores.keys():
-            return self.operadores[identificador].lower(), self.operadores[identificador].lower()
-        elif identificador in self.palavrasReservdas.keys():
-            return self.palavrasReservdas[identificador].lower(), self.palavrasReservdas[identificador].lower()
-        else:
-            return identificador,'identificador'
     
+    def processaComentario(self, caractere):
+        if caractere == '/':
+            caractere = self.proximoCaractere()
+            while caractere not in '\0\r\n':
+                caractere = self.proximoCaractere()
+        if caractere == '{':
+            caractere = self.proximoCaractere()
+            while caractere != '}':
+                if caractere == '\0':
+                    raise analisadorLexicoErro('erro no comentario.')
+                caractere = self.proximoCaractere()
+        if caractere == '(':
+            self.proximoCaractere()
+            caractere = self.proximoCaractere()
+            prox = self.proximoCaractere()
+            while caractere != '*' or prox != ')':
+                if caractere == '\0' or prox == '\0':
+                    raise analisadorLexicoErro('erro no comentario.')
+                caractere = prox
+                prox = self.proximoCaractere()
+        return 'Comentario', None
+        
     def processaOperador(self, caractere):
         if caractere in '+-*=;,)[]':
             return caractere, caractere
@@ -199,32 +228,12 @@ class analisadorLexico():
             else:
                 return '<', '<'
         else:
-            raise analisadorLexicoErro('erro lexico')
-    
-    #Diogo continua
-    def processaComentario(self, caractere):
-        if caractere == '/':
-            caractere = self.proximoCaractere()
-            while caractere not in '\0\r\n':
-                caractere = self.proximoCaractere()
-        if caractere == '{':
-            caractere = self.proximoCaractere()
-            while caractere != '}':
-                if caractere == '\0':
-                    raise analisadorLexicoErro('erro no comentario.')
-                caractere = self.proximoCaractere()
-        if caractere == '(':
-            self.proximoCaractere()
-            caractere = self.proximoCaractere()
-            prox = self.proximoCaractere()
-            while caractere != '*' or prox != ')':
-                if caractere == '\0' or prox == '\0':
-                    raise analisadorLexicoErro('erro no comentario.')
-                caractere = prox
-                prox = self.proximoCaractere()
-        return 'Comentario', None
-        
+           raise analisadorLexicoErro('erro lexico')
+
     def criaTabela(self):
         while (self.cabeca < len(self.arquivo)):
             self.proximoToken()
-    
+
+    def mostraTabela(self):
+        for linha in self.tabelaToknes:
+            print(linha)

@@ -1,12 +1,18 @@
 from typing import Text
+from sintatico import AnalisadorSintatico 
 import sys
 from lexico import analisadorLexico
-from sintatico import AnalisadorSintatico 
+
 
 if __name__ == "__main__":
-   lexico = analisadorLexico('main.pas')
-   lexico.criaTabela()
-   sintatico = AnalisadorSintatico(lexico.tabelaToknes)
+   if len(sys.argv) == 0:
+      print('informe o caminho do arquivo')
+   else:
+      lexico = analisadorLexico(sys.argv[1])
+      lexico.criaTabela()
 
-   flag = sintatico.valida()
-   print(flag)
+      sintatico = AnalisadorSintatico(lexico.tabelaToknes)
+
+      flag = sintatico.valida()
+      if flag:
+         print('analise lexica, sintatica, semantica ok')
